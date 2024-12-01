@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Sessions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #3a6073, #16222a);
+            background-attachment: fixed;
+            color: white;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .container:hover {
+            transform: scale(1.02);
+        }
+        h1 {
+            font-size: 2em;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"],
+        input[type="password"],
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .logout {
+            background: #dc3545;
+        }
+        .logout:hover {
+            background: #a71d2a;
+        }
+        .output {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .output h3 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container"></div>
+
+    <script>
+        const app = document.getElementById('app');
+        const validUsername = 'user';
+        const validPassword = 'password';
+
+        function showLogin() {
+            app.innerHTML = `
+                <h1>Login</h1>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="login()">Login</button>
+            `;
+        }
+
+        function showHome(successMessage = '') {
+            const storedStrings = localStorage.getItem('strings') ? localStorage.getItem('strings').split('|') : [];
+            app.innerHTML = `
+                <h1>Welcome</h1>
+                ${successMessage ? `<p class="success">${successMessage}</p>` : ''}
+                <input type="text" id="userString" placeholder="Enter a string">
+                <button onclick="submitString()">Submit</button>
+                <button class="logout" onclick="logout()">Logout</button>
+                <div class="output">
+                    <h3>Submitted Strings:</h3>
+                    <ul>
+                        ${storedStrings.map(str => `<li>${str}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === validUsername && password === validPassword) {
+                sessionStorage.setItem('loggedIn', true);
+                showHome('Login successful! Welcome.');
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('loggedIn');
+                showLogin();
+            }
+        }
+
+        function submitString() {
+            const userString = document.getElementById('userString').value;
+            if (userString.trim() === '') {
+                alert('Please enter a valid string.');
+                return;
+            }
+
+            let storedStrings = localStorage.getItem('strings') ? localStorage.getItem('strings') : '';
+            storedStrings = storedStrings ? `${storedStrings}|${userString}` : userString;
+            localStorage.setItem('strings', storedStrings);
+            showHome();
+        }
+
+        if (sessionStorage.getItem('loggedIn')) {
+            showHome();
+        } else {
+            showLogin();
+        }
+    </script>
+</body>
+</html>
